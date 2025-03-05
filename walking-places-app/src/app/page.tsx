@@ -2,13 +2,25 @@
 
 import { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import PlacePhotoDisplay from "./PlacePhotoDisplay";
+
+export type Photo = {
+  photo_reference: string;
+  height: number;
+  width: number;
+  // Add other photo properties if needed
+};
+
 
 type Place = {
+  name: string;
+  place_id: string;
+  photos: Photo[];
   geometry: {
     location: {
       lat: number;
       lng: number;
-    };
+    }
   };
   // Add other properties of a place if needed
 };
@@ -36,13 +48,21 @@ export default function Home() {
 
   const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "YOUR_DEFAULT_API_KEY";
 
+  function displayPlace(aPlace: Place) {
+    const myName = aPlace.name;
+    console.log('ref for photo is ' + aPlace.photos[0].photo_reference);
+    alert(myName);
+  }
+
   return (
     <div>
       <h1>Where?</h1>
+      <h2>Top spots for a lovely walk</h2>
       <LoadScript googleMapsApiKey={googleMapsApiKey}>
+        <PlacePhotoDisplay place={places[0]} />
         <GoogleMap mapContainerStyle={{ width: "100%", height: "500px" }} zoom={13} center={location}>
           {places.map((place, index) => (
-            <Marker key={index} position={{ lat: place.geometry.location.lat, lng: place.geometry.location.lng }} />
+            <Marker key={index} onClick={()=>displayPlace(place)} position={{ lat: place.geometry.location.lat, lng: place.geometry.location.lng }} />
           ))}
         </GoogleMap>
       </LoadScript>
