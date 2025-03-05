@@ -1,15 +1,16 @@
 // app/api/photo/route.ts
 import { NextResponse, NextRequest } from "next/server";
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
-    const { photoName } = await req.json(); // Get photoName from request body
+    const { searchParams } = new URL(req.url);
+    const photoName = searchParams.get("photoName");
 
     if (!photoName) {
       return NextResponse.json({ error: "photoName is required" }, { status: 400 });
     }
 
-    const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+    const apiKey = process.env.GOOGLE_PLACES_API_KEY; // Get API key from environment variables
 
     const photoUrl = `https://places.googleapis.com/v1/${photoName}/media?key=${apiKey}&maxWidth=400`;
 
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
     const arrayBuffer = await response.arrayBuffer();
 
     return new NextResponse(arrayBuffer, {
-      headers: { "Content-Type": "image/jpeg" },
+      headers: { "Content-Type": "image/jpeg" }, // Adjust content type as needed
     });
   } catch (error) {
     console.error("Error fetching photo:", error);
