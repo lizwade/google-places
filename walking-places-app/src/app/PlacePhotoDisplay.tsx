@@ -14,12 +14,14 @@ function PlacePhotoDisplay({ place }: { place: Place }) {
   useEffect(() => {
     const fetchPhoto = async () => {
       if (place?.photos && place.photos.length > 0) {
-        const photo = place.photos[0];
+          const photo = place.photos[0];
+          
+          const stringToFetch = `/api/photo?photoReference=${photo.photo_reference}`;
+          console.log("In the PlacePhotoDisplay component. stringToFetch is ");
+          console.log(stringToFetch);
 
         try {
-          const response = await fetch(
-            `/api/photo?photoReference=${photo.photo_reference}`
-          );
+          const response = await fetch(stringToFetch);
 
           if (response.ok) {
             const blob = await response.blob();

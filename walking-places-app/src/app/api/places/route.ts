@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
       }
     );
     console.log("got places:");
-    console.log(response.data.results);
+    //console.log(response.data.results);
     return NextResponse.json(response.data.results);
   } catch (error) {
       console.log(error);
