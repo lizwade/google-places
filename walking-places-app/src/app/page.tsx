@@ -4,15 +4,14 @@ import { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
 type Place = {
-  geometry: {
-    location: {
-      lat: number;
-      lng: number;
+    
+  location: {
+      latitude: number;
+      longitude: number;
     };
-  };
+  
   // Add other properties of a place if needed
 };
-
 
 export default function Home() {
   const [places, setPlaces] = useState<Place[]>([]);
@@ -25,13 +24,29 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const fetchPlaces = async () => {
-      const res = await fetch(`/api/places?lat=${location.lat}&lng=${location.lng}`);
-      const data: Place[] = await res.json();
-      setPlaces(data);
+    const getPlaces = async () => {
+      try {
+        const response = await fetch("/api/places", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ lat: location.lat, lng: location.lng }),
+        });
+
+        if (!response.ok) {
+          console.error("API Error:", response.status, response.statusText);
+          return;
+        }
+
+        const data: Place[] = await response.json();
+        setPlaces(data);
+      } catch (error) {
+        console.error("Fetch Error:", error);
+      }
     };
 
-    fetchPlaces();
+    getPlaces();
   }, [location]);
 
   const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "YOUR_DEFAULT_API_KEY";
@@ -42,7 +57,7 @@ export default function Home() {
       <LoadScript googleMapsApiKey={googleMapsApiKey}>
         <GoogleMap mapContainerStyle={{ width: "100%", height: "500px" }} zoom={13} center={location}>
           {places.map((place, index) => (
-            <Marker key={index} position={{ lat: place.geometry.location.lat, lng: place.geometry.location.lng }} />
+            <Marker key={index} position={{ lat: place.location.latitude, lng: place.location.longitude }} />
           ))}
         </GoogleMap>
       </LoadScript>
